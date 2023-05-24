@@ -21,9 +21,13 @@
           (ngSubmit)="submitValidator()"
         >
           <textarea
+            id="textArea"
+            [(ngModel)]="code"
+            (ngModelChange)="onChange($event)"
             formControlName="validator"
             class="text-area"
             placeholder="digite el codigo c++"
+            spellcheck="false"
           ></textarea>
 
           <button

@@ -24,13 +24,10 @@ const tokens = {
   '<=': 'simbolo',
   '==': 'simbolo',
   ';': 'simbolo',
-}
-
-const ignore = {
-  '(': ' ',
-  ')': ' ',
-  '{': ' ',
-  '}': ' ',
+  '(': 'simbolo',
+  ')': 'simbolo',
+  '{': 'simbolo',
+  '}': 'simbolo',
 }
 
 @Component({
@@ -40,6 +37,7 @@ const ignore = {
 })
 export class AppComponent implements OnInit {
   title = 'validador-cPlusPlus'
+  code = ''
   reconocedor!: []
   formValidator!: FormGroup
   @ViewChild('result') result!: ElementRef
@@ -64,12 +62,12 @@ export class AppComponent implements OnInit {
       .split(/\s+/)
       .filter((t) => t.length > 0)
       .map((t) => {
-        if (ignore[t as keyof typeof ignore]) return ''
-        if (verifyNumber.test(t)) return 'numero'
-        if (t.startsWith('"')) return 'valor'
+        // if (ignore[t as keyof typeof ignore]) return ''
+        if (verifyNumber.test(t)) return `[${t}, numero]`
+        if (t.startsWith('"')) return `[${t}, valor]`
         return tokens[t as keyof typeof tokens]
-          ? tokens[t as keyof typeof tokens]
-          : 'identificador'
+          ? `[${t}, ${tokens[t as keyof typeof tokens]}]`
+          : `[${t}, identificador]`
       })
 
     this.setResult(token)
@@ -78,10 +76,22 @@ export class AppComponent implements OnInit {
   setResult(token: any[]) {
     let text = ''
     token.forEach((t) => {
-      text += t + ' '
+      text += t + '\n'
     })
 
     this.result.nativeElement.innerText = text
     console.log(this.result.nativeElement)
+  }
+
+  onChange(e: any) {
+    const textArea = document.getElementById('textArea')
+
+    if (tokens[e as keyof typeof tokens] == 'reservada') {
+      if (textArea?.style.color !== undefined) {
+        textArea.style.color = 'yellow'
+      }
+    } else {
+      if (textArea?.style.color !== undefined) textArea.style.color = 'white'
+    }
   }
 }
