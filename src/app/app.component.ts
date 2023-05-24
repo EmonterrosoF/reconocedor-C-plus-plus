@@ -28,6 +28,7 @@ const tokens = {
   ')': 'simbolo',
   '{': 'simbolo',
   '}': 'simbolo',
+  ':': 'simbolo',
 }
 
 @Component({
