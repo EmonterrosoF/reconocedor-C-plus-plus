@@ -41,7 +41,9 @@ export class AppComponent implements OnInit {
   code = ''
   reconocedor!: []
   formValidator!: FormGroup
+
   @ViewChild('result') result!: ElementRef
+  @ViewChild('error') errors!: ElementRef
 
   constructor(private fb: FormBuilder) {}
 
@@ -58,14 +60,27 @@ export class AppComponent implements OnInit {
   }
 
   verifyLexico(value: string): void {
-    const verifyNumber = /^([0-9])*$/
+    const patternVerifyNumber = new RegExp(/^([0-9])*$/)
+
+    const patternVerifyValue = new RegExp(/^".*"$/)
+    const patternVerifyValueError = new RegExp(/^".*$/)
+    let isError = false
+
     const token = value
       .split(/\s+/)
       .filter((t) => t.length > 0)
       .map((t) => {
-        // if (ignore[t as keyof typeof ignore]) return ''
-        if (verifyNumber.test(t)) return `[${t}, numero]`
-        if (t.startsWith('"')) return `[${t}, valor]`
+        console.log(patternVerifyValue.test(t), t)
+        if (patternVerifyNumber.test(t)) return `[${t}, numero]`
+        if (patternVerifyValue.test(t)) return `[${t}, valor]`
+
+        if (patternVerifyValueError.test(t)) {
+          isError = true
+          this.errors.nativeElement.innerHTML = `A ocurrido un error en el valor ${t}`
+          return ''
+        }
+        if (!isError) this.errors.nativeElement.innerHTML = ''
+
         return tokens[t as keyof typeof tokens]
           ? `[${t}, ${tokens[t as keyof typeof tokens]}]`
           : `[${t}, identificador]`
@@ -74,14 +89,14 @@ export class AppComponent implements OnInit {
     this.setResult(token)
   }
 
-  setResult(token: any[]) {
+  setResult(token: string[]) {
     let text = ''
     token.forEach((t) => {
+      if (t === '') return
       text += t + '\n'
     })
 
     this.result.nativeElement.innerText = text
-    console.log(this.result.nativeElement)
   }
 
   onChange(e: any) {
